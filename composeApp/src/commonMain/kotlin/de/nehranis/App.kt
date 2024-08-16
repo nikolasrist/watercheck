@@ -15,7 +15,11 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 const val LAST_12_HOURS = 12
 const val LAST_7_DAYS = 7
+const val LAST_30_DAYS = 30
+const val HOURS_TITLE = "Stunden"
+const val DAYS_TITLE = "Tage"
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 @Preview
 fun App() {
@@ -108,18 +112,28 @@ fun App() {
         )
 
         var selectedTimeRange by remember { mutableStateOf(LAST_12_HOURS) }
+        var selectedTimeRangeTitle: String by remember { mutableStateOf("Stunden") }
 
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             // Navigation buttons
-            Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = { selectedTimeRange = LAST_12_HOURS }) {
-                    Text("Last 12 Hours")
+            FlowRow(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = {
+                    selectedTimeRange = LAST_12_HOURS
+                    selectedTimeRangeTitle = HOURS_TITLE
+                }) {
+                    Text("Letzten 12 Stunden")
                 }
-                Button(onClick = { selectedTimeRange = LAST_7_DAYS }) {
-                    Text("Last 7 Days")
+                Button(onClick = {
+                    selectedTimeRange = LAST_7_DAYS
+                    selectedTimeRangeTitle = DAYS_TITLE
+                }) {
+                    Text("Letzten 7 Tage")
                 }
-                Button(onClick = { selectedTimeRange = 24 }) {
-                    Text("All")
+                Button(onClick = {
+                    selectedTimeRange = LAST_30_DAYS
+                    selectedTimeRangeTitle = DAYS_TITLE
+                }) {
+                    Text("Letzten 30 Tage")
                 }
             }
 
@@ -134,7 +148,11 @@ fun App() {
                 }
             }
             // Display the plot based on the filtered data
-            ThroughputPlot(filteredThroughputs)
+            ThroughputPlot(
+                filteredThroughputs,
+                title = "Durchschnitt Durchfluss in den letzten ${selectedTimeRange} ${selectedTimeRangeTitle}.",
+                xAxisTitle = selectedTimeRangeTitle
+            )
         }
 
     }

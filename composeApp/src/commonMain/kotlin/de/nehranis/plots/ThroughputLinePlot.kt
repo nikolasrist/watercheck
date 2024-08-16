@@ -34,7 +34,9 @@ import kotlin.math.ceil
 @Composable
 fun ThroughputPlot(
     throughputs: List<Throughput>,
-    title: String = "Durchschnitt Durchfluss in den letzten ${throughputs.count()} Stunden.",
+    title: String = "Durchschnitts Durchfluss",
+    xAxisTitle: String = "Uhrzeit",
+    yAxisTitle: String = "Durchschnittswert",
     paddingMod: Modifier = Modifier.padding(16.dp)
 ) {
     // Extract meanValue and timestamp (hour) from each Throughput object
@@ -64,7 +66,7 @@ fun ThroughputPlot(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    AxisTitle("Uhrzeit")
+                    AxisTitle(xAxisTitle)
                 }
             },
             yAxisLabels = {
@@ -76,7 +78,7 @@ fun ThroughputPlot(
                     contentAlignment = Alignment.TopStart
                 ) {
                     AxisTitle(
-                        "Durchschnittswert",
+                        yAxisTitle,
                         modifier = Modifier.rotateVertically(VerticalRotation.COUNTER_CLOCKWISE)
                             .padding(bottom = 16.dp)
                     )
