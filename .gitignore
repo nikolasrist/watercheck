@@ -27,3 +27,4 @@ replay_pid*
 
 iosApp.xcodeproj/
 composeApp/build/
+.kotlin/
