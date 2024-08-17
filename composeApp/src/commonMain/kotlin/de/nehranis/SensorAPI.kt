@@ -7,7 +7,7 @@ import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-const val URL = "https://192.168.2.154:8080"
+const val URL = "http://192.168.2.154:8080"
 
 class SensorAPI {
     private val httpClient = HttpClient {
@@ -20,11 +20,17 @@ class SensorAPI {
     }
 
     suspend fun getAllThroughputs(): List<Throughput> {
-        return httpClient.get(URL).body()
+        return httpClient.get("$URL/throughputs").body()
     }
 
-    suspend fun getHourlyThroughputs(sinceDays: Int): List<Throughput> {
-        return httpClient.get(URL) {
+    suspend fun getHourlyThroughputs(sinceHours: Int): List<Throughput> {
+        return httpClient.get("$URL/throughputs/hourly") {
+            parameter("sinceHours", sinceHours)
+        }.body()
+    }
+
+    suspend fun getDailyThroughputs(sinceDays: Int): List<Throughput> {
+        return httpClient.get("$URL/throughputs/daily") {
             parameter("sinceDays", sinceDays)
         }.body()
     }
