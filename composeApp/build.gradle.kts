@@ -107,6 +107,13 @@ android {
     dependencies {
         debugImplementation(compose.uiTooling)
     }
+    signingConfigs {
+        create("release") {
+            keyAlias = "watercheck-key"
+            storeFile = file("/Users/nikolasrist/dev/watercheck/my-release-key.jks")
+            storePassword = "hello123$"
+        }
+    }
 }
 
 compose.desktop {
