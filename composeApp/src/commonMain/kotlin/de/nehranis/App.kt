@@ -80,7 +80,7 @@ fun App() {
             } else {
                 // Display the plot based on the filtered data
                 if (filteredThroughputs.isNullOrEmpty()) {
-                    Text("Keine Daten vorhanden.")
+                    Text("Keine Daten vorhanden.", color = MaterialTheme.colors.error)
                 } else {
                     filteredThroughputs?.let {
                         ThroughputPlot(
