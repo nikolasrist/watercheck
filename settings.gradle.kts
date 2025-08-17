@@ -1,4 +1,4 @@
-rootProject.name = "Wassercheck"
+rootProject.name = "WidderCheck"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

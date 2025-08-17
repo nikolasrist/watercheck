@@ -23,6 +23,7 @@ const val HOURS_TITLE = "Stunden"
 const val DAYS_TITLE = "Tage"
 val sensorApi = SensorAPI()
 
+@Suppress("ktlint:standard:function-naming")
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 @Preview
@@ -44,8 +45,11 @@ fun App() {
         }
 
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.Center) {
+                Text("WidderCheck", style = MaterialTheme.typography.h5, color = MaterialTheme.colors.secondaryVariant)
+            }
             // Navigation buttons
-            FlowRow(Modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FlowRow(Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 Button(onClick = {
                     selectedTimeRangeValue = LAST_12_HOURS
                     selectedTimeRangeTitle = HOURS_TITLE
@@ -55,29 +59,7 @@ fun App() {
                         isLoading = loading
                     }
                 }) {
-                    Text("Letzten 12 Stunden")
-                }
-                Button(onClick = {
-                    selectedTimeRangeValue = LAST_7_DAYS
-                    selectedTimeRangeTitle = DAYS_TITLE
-                    selectedTimeRange = TimeRange.DAYS
-                    loadData(coroutineScope, selectedTimeRangeValue) { data, loading ->
-                        filteredThroughputs = data
-                        isLoading = loading
-                    }
-                }) {
-                    Text("Letzten 7 Tage")
-                }
-                Button(onClick = {
-                    selectedTimeRangeValue = LAST_14_DAYS
-                    selectedTimeRangeTitle = DAYS_TITLE
-                    selectedTimeRange = TimeRange.DAYS
-                    loadData(coroutineScope, selectedTimeRangeValue) { data, loading ->
-                        filteredThroughputs = data
-                        isLoading = loading
-                    }
-                }) {
-                    Text("Letzten 14 Tage")
+                    Text("12 Stunden")
                 }
                 Button(onClick = {
                     selectedTimeRangeValue = LAST_30_DAYS
@@ -88,7 +70,7 @@ fun App() {
                         isLoading = loading
                     }
                 }) {
-                    Text("Letzten 30 Tage")
+                    Text("30 Tage")
                 }
             }
 
@@ -97,13 +79,17 @@ fun App() {
                 CircularProgressIndicator()
             } else {
                 // Display the plot based on the filtered data
-                filteredThroughputs?.let {
-                    ThroughputPlot(
-                        it,
-                        title = "Durchschnitt Durchfluss in den letzten $selectedTimeRangeValue $selectedTimeRangeTitle.",
-                        xAxisTitle = selectedTimeRangeTitle,
-                        timeRange = selectedTimeRange
-                    )
+                if (filteredThroughputs.isNullOrEmpty()) {
+                    Text("Keine Daten vorhanden.")
+                } else {
+                    filteredThroughputs?.let {
+                        ThroughputPlot(
+                            it,
+                            title = "Durchschnitt Durchfluss in den letzten $selectedTimeRangeValue $selectedTimeRangeTitle.",
+                            xAxisTitle = selectedTimeRangeTitle,
+                            timeRange = selectedTimeRange,
+                        )
+                    }
                 }
             }
         }
@@ -113,17 +99,23 @@ fun App() {
 private fun loadData(
     scope: CoroutineScope,
     timeRange: Int,
-    onResult: (List<Throughput>?, Boolean) -> Unit
+    onResult: (List<Throughput>?, Boolean) -> Unit,
 ) {
     scope.launch {
-        onResult(null, true)  // Set loading state to true
-        val data = fetchData(timeRange)  // Fetch data from API
-        onResult(data, false)  // Set data and loading state to false
+        onResult(null, true) // Set loading state to true
+        try {
+            val data = fetchData(timeRange) // Fetch data from API
+            onResult(data, false) // Set data and loading state to false
+        } catch (_: Exception) {
+            // Handle network/API errors gracefully
+            onResult(emptyList(), false) // Set empty data and stop loading
+            // You might want to show an error message to the user
+        }
     }
 }
 
-private suspend fun fetchData(selectedTimeRange: Int): List<Throughput> {
-    return when (selectedTimeRange) {
+private suspend fun fetchData(selectedTimeRange: Int): List<Throughput> =
+    when (selectedTimeRange) {
         LAST_12_HOURS -> sensorApi.getHourlyThroughputs(LAST_12_HOURS).reversed()
         LAST_7_DAYS -> sensorApi.getDailyThroughputs(LAST_7_DAYS).reversed()
         LAST_14_DAYS -> sensorApi.getDailyThroughputs(LAST_14_DAYS).reversed()
@@ -132,4 +124,3 @@ private suspend fun fetchData(selectedTimeRange: Int): List<Throughput> {
             throw NotImplementedError()
         }
     }
-}

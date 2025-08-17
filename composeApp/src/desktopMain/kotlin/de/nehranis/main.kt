@@ -3,11 +3,12 @@ package de.nehranis
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
-fun main() = application {
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = "watercheck",
-    ) {
-        App()
+fun main() =
+    application {
+        Window(
+            onCloseRequest = ::exitApplication,
+            title = "WidderCheck",
+        ) {
+            App()
+        }
     }
-}
