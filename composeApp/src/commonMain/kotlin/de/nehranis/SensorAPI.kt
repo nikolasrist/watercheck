@@ -7,7 +7,7 @@ import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-const val URL = "http://192.168.2.154:8080"
+const val URL = "http://192.168.2.210:8080"
 
 class SensorAPI {
     private val httpClient =

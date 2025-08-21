@@ -1,7 +1,9 @@
 package de.nehranis.plots
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,10 +23,15 @@ import io.github.koalaplot.core.xygraph.DefaultPoint
 import io.github.koalaplot.core.xygraph.FloatLinearAxisModel
 import io.github.koalaplot.core.xygraph.XYGraph
 import io.github.koalaplot.core.xygraph.XYGraphScope
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 
-enum class TimeRange(i: Int) {
+enum class TimeRange(
+    i: Int,
+) {
     DAYS(12),
-    HOURS(12)
+    HOURS(12),
 }
 
 @OptIn(ExperimentalKoalaPlotApi::class)
@@ -35,23 +42,35 @@ fun ThroughputPlot(
     xAxisTitle: String = "Uhrzeit",
     yAxisTitle: String = "Durchschnittswert",
     timeRange: TimeRange = TimeRange.DAYS,
-    paddingMod: Modifier = Modifier.padding(16.dp)
+    timeZone: TimeZone = TimeZone.currentSystemDefault(),
 ) {
     // Extract meanValue and timestamp (hour) from each Throughput object
+    val paddingMod: Modifier = Modifier.padding(16.dp)
     val meanValues = throughputs.map { it.meanValue }
-    val xAxisLabels = throughputs.map {
-        when (timeRange) {
-            TimeRange.DAYS -> if (throughputs.size > 14) it.timestamp.dayOfMonth.toString().padStart(2, '0') else "${
-                it.timestamp.dayOfMonth.toString().padStart(2, '0')
-            }.${it.timestamp.monthNumber}"
+    val xAxisLabels =
+        throughputs.map {
+            when (timeRange) {
+                TimeRange.DAYS ->
+                    if (throughputs.size > 14) {
+                        it.timestamp.dayOfMonth
+                            .toString()
+                            .padStart(2, '0')
+                    } else {
+                        "${
+                            it.timestamp.dayOfMonth.toString().padStart(2, '0')
+                        }.${it.timestamp.monthNumber}"
+                    }
 
-            TimeRange.HOURS -> it.timestamp.hour.toString().padStart(2, '0')
+                TimeRange.HOURS ->
+                    it.timestamp.hour
+                        .toString()
+                        .padStart(2, '0')
+            }
         }
-    }
 
 // Calculate the Y-axis range based on the max value
     val maxMeanValue = meanValues.maxOrNull() ?: 0.0
-    val buffer = 2.0  // Fixed buffer
+    val buffer = 2.0 // Fixed buffer
     val yAxisMax = (maxMeanValue + buffer).toFloat()
 
 // Create the chart layout
@@ -61,17 +80,18 @@ fun ThroughputPlot(
     ) {
         XYGraph(
             xAxisModel = CategoryAxisModel(xAxisLabels),
-            yAxisModel = FloatLinearAxisModel(
-                0f..yAxisMax,
-                minimumMajorTickSpacing = 50.dp,
-            ),
+            yAxisModel =
+                FloatLinearAxisModel(
+                    0f..yAxisMax,
+                    minimumMajorTickSpacing = 50.dp,
+                ),
             xAxisLabels = {
                 AxisLabel(it, Modifier.padding(top = 2.dp))
             },
             xAxisTitle = {
                 Box(
                     modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     AxisTitle(xAxisTitle)
                 }
@@ -82,21 +102,23 @@ fun ThroughputPlot(
             yAxisTitle = {
                 Box(
                     modifier = Modifier.fillMaxHeight(),
-                    contentAlignment = Alignment.TopStart
+                    contentAlignment = Alignment.Center,
                 ) {
                     AxisTitle(
                         yAxisTitle,
-                        modifier = Modifier.rotateVertically(VerticalRotation.COUNTER_CLOCKWISE)
-                            .padding(bottom = 16.dp)
+                        modifier =
+                            Modifier
+                                .rotateVertically(VerticalRotation.COUNTER_CLOCKWISE),
                     )
                 }
-            }
+            },
         ) {
             // Plotting the line for the throughput mean values
             chart(
-                data = meanValues.mapIndexed { index, meanValue ->
-                    DefaultPoint(xAxisLabels[index], meanValue.toFloat())
-                }
+                data =
+                    meanValues.mapIndexed { index, meanValue ->
+                        DefaultPoint(xAxisLabels[index], meanValue.toFloat())
+                    },
             )
         }
     }
@@ -104,21 +126,20 @@ fun ThroughputPlot(
 
 @OptIn(ExperimentalKoalaPlotApi::class)
 @Composable
-private fun XYGraphScope<String, Float>.chart(
-    data: List<DefaultPoint<String, Float>>,
-) {
+private fun XYGraphScope<String, Float>.chart(data: List<DefaultPoint<String, Float>>) {
     LinePlot(
         data = data,
-        lineStyle = LineStyle(
-            brush = SolidColor(Color.Black),
-            strokeWidth = 2.dp
-        ),
+        lineStyle =
+            LineStyle(
+                brush = SolidColor(MaterialTheme.colors.secondaryVariant),
+                strokeWidth = 2.dp,
+            ),
         symbol = { point ->
             Symbol(
                 shape = CircleShape,
-                fillBrush = SolidColor(Color.Black),
-                modifier = Modifier
+                fillBrush = SolidColor(MaterialTheme.colors.secondaryVariant),
+                modifier = Modifier,
             )
-        }
+        },
     )
 }

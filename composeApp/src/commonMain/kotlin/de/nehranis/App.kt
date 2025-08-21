@@ -1,13 +1,18 @@
 package de.nehranis
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.darkColors
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import de.nehranis.plots.ThroughputPlot
 import de.nehranis.plots.TimeRange
@@ -28,7 +33,7 @@ val sensorApi = SensorAPI()
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
+    MaterialTheme(colors = darkColors()) {
         var selectedTimeRange by remember { mutableStateOf(TimeRange.HOURS) }
         var selectedTimeRangeValue by remember { mutableStateOf(LAST_12_HOURS) }
         var selectedTimeRangeTitle by remember { mutableStateOf("Stunden") }
@@ -43,52 +48,65 @@ fun App() {
                 isLoading = loading
             }
         }
-
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.Center) {
-                Text("WidderCheck", style = MaterialTheme.typography.h5, color = MaterialTheme.colors.secondaryVariant)
-            }
-            // Navigation buttons
-            FlowRow(Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                Button(onClick = {
-                    selectedTimeRangeValue = LAST_12_HOURS
-                    selectedTimeRangeTitle = HOURS_TITLE
-                    selectedTimeRange = TimeRange.HOURS
-                    loadData(coroutineScope, selectedTimeRangeValue) { data, loading ->
-                        filteredThroughputs = data
-                        isLoading = loading
-                    }
-                }) {
-                    Text("12 Stunden")
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colors.background,
+            contentColor = MaterialTheme.colors.onBackground,
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.Center) {
+                    Text(
+                        "WidderCheck",
+                        style = MaterialTheme.typography.h5,
+                        color = MaterialTheme.colors.secondary,
+                    )
                 }
-                Button(onClick = {
-                    selectedTimeRangeValue = LAST_30_DAYS
-                    selectedTimeRangeTitle = DAYS_TITLE
-                    selectedTimeRange = TimeRange.DAYS
-                    loadData(coroutineScope, selectedTimeRangeValue) { data, loading ->
-                        filteredThroughputs = data
-                        isLoading = loading
+                // Navigation buttons
+                FlowRow(Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Button(
+                        onClick = {
+                            selectedTimeRangeValue = LAST_12_HOURS
+                            selectedTimeRangeTitle = HOURS_TITLE
+                            selectedTimeRange = TimeRange.HOURS
+                            loadData(coroutineScope, selectedTimeRangeValue) { data, loading ->
+                                filteredThroughputs = data
+                                isLoading = loading
+                            }
+                        },
+                    ) {
+                        Text("12 Stunden")
                     }
-                }) {
-                    Text("30 Tage")
+                    Button(onClick = {
+                        selectedTimeRangeValue = LAST_30_DAYS
+                        selectedTimeRangeTitle = DAYS_TITLE
+                        selectedTimeRange = TimeRange.DAYS
+                        loadData(coroutineScope, selectedTimeRangeValue) { data, loading ->
+                            filteredThroughputs = data
+                            isLoading = loading
+                        }
+                    }) {
+                        Text("30 Tage")
+                    }
                 }
-            }
 
-            // Show a loading indicator while data is being fetched
-            if (isLoading) {
-                CircularProgressIndicator()
-            } else {
-                // Display the plot based on the filtered data
-                if (filteredThroughputs.isNullOrEmpty()) {
-                    Text("Keine Daten vorhanden.", color = MaterialTheme.colors.error)
+                // Show a loading indicator while data is being fetched
+                if (isLoading) {
+                    CircularProgressIndicator()
                 } else {
-                    filteredThroughputs?.let {
-                        ThroughputPlot(
-                            it,
-                            title = "Durchschnitt Durchfluss in den letzten $selectedTimeRangeValue $selectedTimeRangeTitle.",
-                            xAxisTitle = selectedTimeRangeTitle,
-                            timeRange = selectedTimeRange,
-                        )
+                    // Display the plot based on the filtered data
+                    if (filteredThroughputs.isNullOrEmpty()) {
+                        Text("Keine Daten vorhanden.", color = MaterialTheme.colors.error)
+                    } else {
+                        filteredThroughputs?.let {
+                            ThroughputPlot(
+                                it,
+                                title = "Durchschnitt Durchfluss in den letzten $selectedTimeRangeValue $selectedTimeRangeTitle.",
+                                xAxisTitle = selectedTimeRangeTitle,
+                                timeRange = selectedTimeRange,
+                            )
+                        }
                     }
                 }
             }

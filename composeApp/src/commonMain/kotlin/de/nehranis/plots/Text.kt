@@ -13,9 +13,9 @@ fun ChartTitle(title: String) {
     Column {
         Text(
             title,
-            color = MaterialTheme.colors.onBackground,
-            style = MaterialTheme.typography.h5,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            color = MaterialTheme.colors.secondary,
+            style = MaterialTheme.typography.caption,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
         )
     }
 }
@@ -23,24 +23,27 @@ fun ChartTitle(title: String) {
 @Composable
 fun AxisTitle(
     title: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Text(
         title,
-        color = MaterialTheme.colors.onBackground,
+        color = MaterialTheme.colors.secondaryVariant,
         style = MaterialTheme.typography.caption,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
 @Composable
-fun AxisLabel(label: String, modifier: Modifier = Modifier) {
+fun AxisLabel(
+    label: String,
+    modifier: Modifier = Modifier,
+) {
     Text(
         label,
-        color = MaterialTheme.colors.onBackground,
+        color = MaterialTheme.colors.secondary,
         style = MaterialTheme.typography.caption,
         modifier = modifier,
         overflow = TextOverflow.Ellipsis,
-        maxLines = 1
+        maxLines = 1,
     )
 }
